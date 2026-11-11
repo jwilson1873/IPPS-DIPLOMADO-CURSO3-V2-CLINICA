@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
-
+import bcrypt from 'bcryptjs'
 
 const medicoSchema = new mongoose.Schema({
   nombre: { type: String, required: true, trim: true },
   especialidad: { type: String, required: true, trim: true },
-  email: { type: String, required: true, unique: true, lowercase: true },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   password: { type: String, required: true, minlength: 6 },
 }, { timestamps: true })
 
@@ -23,8 +23,9 @@ medicoSchema.methods.toJSON = function () {
   delete obj.password
   return obj
 }
+
 export const Medico = mongoose.model(
-    'Medico',
-    medicoSchema,
-    'medicos'
+  'Medico',
+  medicoSchema,
+  'medicos'
 )

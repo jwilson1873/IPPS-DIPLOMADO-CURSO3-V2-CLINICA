@@ -1,9 +1,6 @@
 import mongoose from 'mongoose'
 
-
-const MONGODB_URI = ''
-
 export const conectar = async () => {
-    await mongoose.connect( MONGODB_URI )
-    consolelog('conectado a la bd')
+  await mongoose.connect(process.env.MONGODB_URI)
+  console.log('conectado a la bd')
 }

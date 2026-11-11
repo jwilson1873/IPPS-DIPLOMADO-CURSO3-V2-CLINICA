@@ -1,8 +1,13 @@
 {
   "name": "clinica",
   "version": "1.0.0",
+  "type": "module",
   "main": "server.js",
   "license": "MIT",
+  "scripts": {
+    "dev": "node --watch --env-file=.env server.js",
+    "start": "node server.js"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
