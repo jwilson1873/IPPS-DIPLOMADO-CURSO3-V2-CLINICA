@@ -61,7 +61,16 @@ Content-Type: application/json
   "password": "password123"
 }
 
-### 1.5 Iniciar sesión con contraseña incorrecta -> 401 Unauthorized
+### 1.5 Iniciar sesión con Dr. Carlos -> 200 OK
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "carlos@clinica.cl",
+  "password": "password456"
+}
+
+### 1.6 Iniciar sesión con contraseña incorrecta -> 401 Unauthorized
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 

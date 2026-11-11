@@ -364,6 +364,7 @@ Se incluye en el repositorio la colección oficial lista para importar en Postma
    - Ejecuta `Paso 1b - Registrar Médico 2 (Dr. Carlos)` (`POST /auth/registro`). Status: **`201 Created`**.
 2. **Iniciar sesión:**
    - Ejecuta `Paso 1c - Iniciar Sesión con Dra. Ana` (`POST /auth/login`). Status: **`200 OK`**.
+   - Ejecuta `Paso 1d - Iniciar Sesión con Dr. Carlos` (`POST /auth/login`). Status: **`200 OK`**. (Guarda el token del Dr. Carlos).
 3. **Petición sin token:**
    - Ejecuta `Paso 2 - Petición SIN Token (Seguridad)` (`GET /pacientes`). Status: **`401 Unauthorized`**.
 4. **Crear paciente con Dra. Ana:**
