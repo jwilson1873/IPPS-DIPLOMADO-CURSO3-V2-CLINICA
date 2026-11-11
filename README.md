@@ -345,24 +345,39 @@ Al recibir el repositorio de la clase, el servidor no iniciaba debido a los sigu
 
 ## 🎬 Guía para la Demostración en Postman
 
-Para grabar tu video de 5 a 8 minutos, sigue este flujo exacto:
+Se incluye en el repositorio la colección oficial lista para importar en Postman:
+- 📁 **Colección de Postman:** [`postman/clinica_postman_collection.json`](file:///c:/Users/jwilson/Desktop/Curso_IPSS/Modulo%203/IPPS-DIPLOMADO-CURSO3-V2-CLINICA/postman/clinica_postman_collection.json)
+- 📁 **Variables de Entorno:** [`postman/clinica_environment.json`](file:///c:/Users/jwilson/Desktop/Curso_IPSS/Modulo%203/IPPS-DIPLOMADO-CURSO3-V2-CLINICA/postman/clinica_environment.json)
+- 📁 **Archivo HTTP para VS Code:** [`requests.http`](file:///c:/Users/jwilson/Desktop/Curso_IPSS/Modulo%203/IPPS-DIPLOMADO-CURSO3-V2-CLINICA/requests.http) (para usar con la extensión *REST Client*).
 
-1. **Registrar dos médicos:**
-   - `POST http://localhost:3001/auth/registro` con Dra. Ana (Pediatría). Status: `201 Created`. Copiar su token.
-   - `POST http://localhost:3001/auth/registro` con Dr. Carlos (Cardiología). Status: `201 Created`. Copiar su token.
+### Cómo importar en Postman:
+1. Abre Postman y haz clic en **Import** (arriba a la izquierda).
+2. Selecciona y arrastra el archivo `postman/clinica_postman_collection.json`.
+3. Verás la colección **"Clínica API - Evaluación Integradora IPSS"**.
+4. Abre la primera carpeta: **`00. Flujo Video (Rubrica Paso a Paso)`**.
+5. Las peticiones cuentan con **scripts automáticos de prueba (Test Scripts)** que capturan los tokens (`tokenAna`, `tokenCarlos`) y los IDs (`idAna`, `idCarlos`, `idPaciente1`) automáticamente en las variables de la colección a medida que las ejecutas, por lo que **no necesitas copiar ni pegar tokens manualmente** durante la grabación.
+
+### Flujo paso a paso para el video (5 a 8 minutos):
+
+1. **Registrar a dos médicos:**
+   - Ejecuta `Paso 1a - Registrar Médico 1 (Dra. Ana)` (`POST /auth/registro`). Status: **`201 Created`**.
+   - Ejecuta `Paso 1b - Registrar Médico 2 (Dr. Carlos)` (`POST /auth/registro`). Status: **`201 Created`**.
 2. **Iniciar sesión:**
-   - `POST http://localhost:3001/auth/login` con credenciales de la Dra. Ana. Status: `200 OK`.
+   - Ejecuta `Paso 1c - Iniciar Sesión con Dra. Ana` (`POST /auth/login`). Status: **`200 OK`**.
 3. **Petición sin token:**
-   - `GET http://localhost:3001/pacientes` sin Authorization header. Status: `401 Unauthorized`.
+   - Ejecuta `Paso 2 - Petición SIN Token (Seguridad)` (`GET /pacientes`). Status: **`401 Unauthorized`**.
 4. **Crear paciente con Dra. Ana:**
-   - `POST http://localhost:3001/pacientes` con Bearer token de la Dra. Ana. Status: `201 Created`.
+   - Ejecuta `Paso 3a - Crear Paciente con Dra. Ana` (`POST /pacientes`). Status: **`201 Created`**.
+   - Muestra cómo en el body se envió el id del Dr. Carlos, pero la API lo ignoró y asignó a la Dra. Ana.
 5. **Consultar paciente por ID:**
-   - `GET http://localhost:3001/pacientes/:id` con token. Status: `200 OK`. (Se observa a la Dra. Ana asociada en el campo `medico`).
+   - Ejecuta `Paso 3b - Consultar Paciente por ID` (`GET /pacientes/:id`). Status: **`200 OK`**.
+   - Muestra cómo los datos de la Dra. Ana vienen poblados en el campo `medico` sin su contraseña.
 6. **Listar pacientes de la Dra. Ana:**
-   - `GET http://localhost:3001/medicos/:id/pacientes` usando el ID de la Dra. Ana. Status: `200 OK`.
+   - Ejecuta `Paso 4 - Listar Pacientes de la Dra. Ana` (`GET /medicos/:id/pacientes`). Status: **`200 OK`**.
 7. **Demostración de la regla de negocio (Médico Tratante):**
-   - `PUT http://localhost:3001/pacientes/:id` usando el token del **Dr. Carlos**.
+   - Ejecuta `Paso 5 - Dr. Carlos intenta editar paciente de Dra. Ana` (`PUT /pacientes/:id`).
    - Status observado: **`403 Forbidden`** (`"No tienes permiso para modificar este paciente"`).
-8. **Validación de unicidad:**
-   - `POST http://localhost:3001/pacientes` intentando registrar a otro paciente con el mismo RUT.
+   - El paciente queda completamente intacto.
+8. **Validación de RUT repetido:**
+   - Ejecuta `Paso 6 - Crear Paciente con RUT Duplicado` (`POST /pacientes`).
    - Status observado: **`409 Conflict`** (`"El RUT ya está registrado"`).

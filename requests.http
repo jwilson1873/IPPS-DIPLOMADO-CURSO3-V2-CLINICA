@@ -1,0 +1,226 @@
+### ==============================================================================
+### CLÍNICA API - ARCHIVO DE PETICIONES HTTP (REST Client / Postman)
+### Base URL: http://localhost:3001
+### ==============================================================================
+
+@baseUrl = http://localhost:3001
+
+### ------------------------------------------------------------------------------
+### 1. AUTENTICACIÓN (/auth)
+### ------------------------------------------------------------------------------
+
+### 1.1 Registrar Médico 1 (Dra. Ana) -> 201 Created
+# @name registroAna
+POST {{baseUrl}}/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Ana Rojas",
+  "especialidad": "Pediatría",
+  "email": "ana@clinica.cl",
+  "password": "password123"
+}
+
+### Guardar token y ID de Dra. Ana para peticiones siguientes:
+@tokenAna = {{registroAna.response.body.token}}
+@idAna = {{registroAna.response.body.medico._id}}
+
+### 1.2 Registrar Médico 2 (Dr. Carlos) -> 201 Created
+# @name registroCarlos
+POST {{baseUrl}}/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Carlos Soto",
+  "especialidad": "Cardiología",
+  "email": "carlos@clinica.cl",
+  "password": "password456"
+}
+
+### Guardar token y ID de Dr. Carlos:
+@tokenCarlos = {{registroCarlos.response.body.token}}
+@idCarlos = {{registroCarlos.response.body.medico._id}}
+
+### 1.3 Intentar registrar con email duplicado -> 409 Conflict
+POST {{baseUrl}}/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Otra Ana",
+  "especialidad": "Dermatología",
+  "email": "ana@clinica.cl",
+  "password": "password789"
+}
+
+### 1.4 Iniciar sesión con Dra. Ana -> 200 OK
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ana@clinica.cl",
+  "password": "password123"
+}
+
+### 1.5 Iniciar sesión con contraseña incorrecta -> 401 Unauthorized
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ana@clinica.cl",
+  "password": "password_erroneo"
+}
+
+
+### ------------------------------------------------------------------------------
+### 2. SEGURIDAD Y MÉDICOS (/medicos)
+### ------------------------------------------------------------------------------
+
+### 2.1 Petición sin token -> 401 Unauthorized
+GET {{baseUrl}}/medicos
+
+### 2.2 Listar todos los médicos (con token) -> 200 OK
+GET {{baseUrl}}/medicos
+Authorization: Bearer {{tokenAna}}
+
+### 2.3 Filtrar médicos por especialidad -> 200 OK
+GET {{baseUrl}}/medicos?especialidad=Pediatría
+Authorization: Bearer {{tokenAna}}
+
+### 2.4 Obtener perfil del médico autenticado -> 200 OK
+GET {{baseUrl}}/medicos/perfil
+Authorization: Bearer {{tokenAna}}
+
+### 2.5 Obtener un médico por su ID -> 200 OK
+GET {{baseUrl}}/medicos/{{idCarlos}}
+Authorization: Bearer {{tokenAna}}
+
+### 2.6 Listar pacientes de la Dra. Ana -> 200 OK
+GET {{baseUrl}}/medicos/{{idAna}}/pacientes
+Authorization: Bearer {{tokenCarlos}}
+
+
+### ------------------------------------------------------------------------------
+### 3. API DE PACIENTES (/pacientes)
+### ------------------------------------------------------------------------------
+
+### 3.1 Petición sin token a /pacientes -> 401 Unauthorized
+GET {{baseUrl}}/pacientes
+
+### 3.2 Dra. Ana crea paciente 1 (Fonasa) -> 201 Created
+# @name crearPaciente1
+POST {{baseUrl}}/pacientes
+Content-Type: application/json
+Authorization: Bearer {{tokenAna}}
+
+{
+  "nombre": "Pedro Pérez",
+  "rut": "12.345.678-9",
+  "fechaNacimiento": "1990-05-15",
+  "prevision": "Fonasa",
+  "telefono": "+56911223344",
+  "email": "pedro@correo.cl",
+  "medico": "{{idCarlos}}"
+}
+
+@idPaciente1 = {{crearPaciente1.response.body._id}}
+
+### 3.3 Dra. Ana crea paciente 2 (Isapre) -> 201 Created
+# @name crearPaciente2
+POST {{baseUrl}}/pacientes
+Content-Type: application/json
+Authorization: Bearer {{tokenAna}}
+
+{
+  "nombre": "María Gómez",
+  "rut": "18.765.432-1",
+  "fechaNacimiento": "1995-10-20",
+  "prevision": "Isapre",
+  "telefono": "+56933445566"
+}
+
+@idPaciente2 = {{crearPaciente2.response.body._id}}
+
+### 3.4 Intentar crear paciente con RUT duplicado -> 409 Conflict
+POST {{baseUrl}}/pacientes
+Content-Type: application/json
+Authorization: Bearer {{tokenCarlos}}
+
+{
+  "nombre": "Otro Paciente",
+  "rut": "12.345.678-9",
+  "fechaNacimiento": "1988-12-01",
+  "prevision": "Isapre"
+}
+
+### 3.5 Dra. Ana consulta "Mis pacientes" -> 200 OK (trae 2 pacientes)
+GET {{baseUrl}}/pacientes
+Authorization: Bearer {{tokenAna}}
+
+### 3.6 Dra. Ana filtra sus pacientes por previsión -> 200 OK (trae a María Gómez)
+GET {{baseUrl}}/pacientes?prevision=Isapre
+Authorization: Bearer {{tokenAna}}
+
+### 3.7 Dr. Carlos consulta "Mis pacientes" -> 200 OK (trae [])
+GET {{baseUrl}}/pacientes
+Authorization: Bearer {{tokenCarlos}}
+
+### 3.8 Consultar paciente por ID (Cualquier médico) -> 200 OK (médico poblado)
+GET {{baseUrl}}/pacientes/{{idPaciente1}}
+Authorization: Bearer {{tokenCarlos}}
+
+### 3.9 Dr. Carlos intenta editar paciente de la Dra. Ana -> 403 Forbidden
+PUT {{baseUrl}}/pacientes/{{idPaciente1}}
+Content-Type: application/json
+Authorization: Bearer {{tokenCarlos}}
+
+{
+  "nombre": "Pedro Modificado por Carlos",
+  "telefono": "+56999999999"
+}
+
+### 3.10 Dra. Ana (médico tratante) edita su paciente -> 200 OK
+PUT {{baseUrl}}/pacientes/{{idPaciente1}}
+Content-Type: application/json
+Authorization: Bearer {{tokenAna}}
+
+{
+  "telefono": "+56988776655",
+  "prevision": "Isapre"
+}
+
+### 3.11 Dr. Carlos intenta eliminar paciente de Dra. Ana -> 403 Forbidden
+DELETE {{baseUrl}}/pacientes/{{idPaciente2}}
+Authorization: Bearer {{tokenCarlos}}
+
+### 3.12 Dra. Ana (médico tratante) elimina a su paciente -> 204 No Content
+DELETE {{baseUrl}}/pacientes/{{idPaciente2}}
+Authorization: Bearer {{tokenAna}}
+
+
+### ------------------------------------------------------------------------------
+### 4. DESAFÍO EXTRA: FICHAS CLÍNICAS (/pacientes/:id/fichas)
+### ------------------------------------------------------------------------------
+
+### 4.1 Dr. Carlos (no tratante) intenta registrar atención -> 403 Forbidden
+POST {{baseUrl}}/pacientes/{{idPaciente1}}/fichas
+Content-Type: application/json
+Authorization: Bearer {{tokenCarlos}}
+
+{
+  "diagnostico": "Chequeo de rutina",
+  "tratamiento": "Control preventivo"
+}
+
+### 4.2 Dra. Ana (médico tratante) registra atención -> 201 Created
+POST {{baseUrl}}/pacientes/{{idPaciente1}}/fichas
+Content-Type: application/json
+Authorization: Bearer {{tokenAna}}
+
+{
+  "diagnostico": "Faringitis aguda",
+  "tratamiento": "Amoxicilina 500mg cada 8 horas por 7 días"
+}
+
+### 4.3 Consultar historial de atenciones del paciente -> 200 OK (médico poblado)
+GET {{baseUrl}}/pacientes/{{idPaciente1}}/fichas
+Authorization: Bearer {{tokenAna}}

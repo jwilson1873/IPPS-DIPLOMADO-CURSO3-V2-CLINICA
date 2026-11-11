@@ -1,0 +1,1223 @@
+{
+	"info": {
+		"_postman_id": "a91b32d0-9f12-4c6e-8e50-f8c6b71e8901",
+		"name": "Clínica API - Evaluación Integradora IPSS",
+		"description": "Colección completa de peticiones HTTP para probar la API REST de la Clínica y realizar la demostración del video evaluativo.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"key": "tokenAna",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tokenCarlos",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "idAna",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "idCarlos",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "idPaciente1",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "idPaciente2",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "00. Flujo Video (Rubrica Paso a Paso)",
+			"description": "Carpeta ordenada con los 8 pasos exactos requeridos para el video de evaluación. Ejecuta estas peticiones en orden.",
+			"item": [
+				{
+					"name": "Paso 1a - Registrar Médico 1 (Dra. Ana) -> 201",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('tokenAna', data.token);",
+									"    pm.collectionVariables.set('idAna', data.medico._id);",
+									"    console.log('Token y ID Dra. Ana guardados');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Ana Rojas\",\n  \"especialidad\": \"Pediatría\",\n  \"email\": \"ana@clinica.cl\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/registro",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"registro"
+							]
+						},
+						"description": "Registra al primer médico (Dra. Ana). Debe responder 201 Created con { medico, token }. La contraseña no debe aparecer."
+					},
+					"response": []
+				},
+				{
+					"name": "Paso 1b - Registrar Médico 2 (Dr. Carlos) -> 201",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('tokenCarlos', data.token);",
+									"    pm.collectionVariables.set('idCarlos', data.medico._id);",
+									"    console.log('Token y ID Dr. Carlos guardados');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Carlos Soto\",\n  \"especialidad\": \"Cardiología\",\n  \"email\": \"carlos@clinica.cl\",\n  \"password\": \"password456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/registro",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"registro"
+							]
+						},
+						"description": "Registra al segundo médico (Dr. Carlos). Debe responder 201 Created con { medico, token }."
+					},
+					"response": []
+				},
+				{
+					"name": "Paso 1c - Iniciar Sesión con Dra. Ana -> 200",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('tokenAna', data.token);",
+									"    console.log('Sesión iniciada. Token Dra. Ana actualizado');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"ana@clinica.cl\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Inicia sesión con la Dra. Ana. Debe responder 200 OK con { medico, token }."
+					},
+					"response": []
+				},
+				{
+					"name": "Paso 2 - Petición SIN Token (Seguridad) -> 401",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						},
+						"description": "Demuestra la protección de rutas. Al pedir GET /pacientes sin cabecera de autenticación debe responder 401 Unauthorized."
+					},
+					"response": []
+				},
+				{
+					"name": "Paso 3a - Crear Paciente con Dra. Ana -> 201",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('idPaciente1', data._id);",
+									"    console.log('ID Paciente 1 guardado:', data._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Pedro Pérez\",\n  \"rut\": \"12.345.678-9\",\n  \"fechaNacimiento\": \"1990-05-15\",\n  \"prevision\": \"Fonasa\",\n  \"telefono\": \"+56911223344\",\n  \"email\": \"pedro@correo.cl\",\n  \"medico\": \"{{idCarlos}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						},
+						"description": "Crea a Pedro Pérez. Fíjate que en el body se envía el id del Dr. Carlos, pero la API lo ignora y asigna a la Dra. Ana (del token) como médico tratante. Debe responder 201 Created."
+					},
+					"response": []
+				},
+				{
+					"name": "Paso 3b - Consultar Paciente por ID -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente1}}"
+							]
+						},
+						"description": "Consulta al paciente recién creado. Debe responder 200 OK y gracias al bonus populate muestra los datos de la Dra. Ana sin su contraseña."
+					},
+					"response": []
+				},
+				{
+					"name": "Paso 4 - Listar Pacientes de la Dra. Ana -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenCarlos}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos/{{idAna}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos",
+								"{{idAna}}",
+								"pacientes"
+							]
+						},
+						"description": "Consulta los pacientes de la Dra. Ana (puede hacerlo cualquier médico autenticado). Debe responder 200 OK con la lista que contiene a Pedro Pérez."
+					},
+					"response": []
+				},
+				{
+					"name": "Paso 5 - Dr. Carlos intenta editar paciente de Dra. Ana (Regla Negocio) -> 403",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenCarlos}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Pedro Modificado por Carlos\",\n  \"telefono\": \"+56999999999\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente1}}"
+							]
+						},
+						"description": "Demuestra la regla de negocio: solo el médico tratante puede modificar. Como el Dr. Carlos no es el médico tratante, la API responde 403 Forbidden y el paciente queda intacto."
+					},
+					"response": []
+				},
+				{
+					"name": "Paso 6 - Crear Paciente con RUT Duplicado -> 409",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenCarlos}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Otro Paciente\",\n  \"rut\": \"12.345.678-9\",\n  \"fechaNacimiento\": \"1988-12-01\",\n  \"prevision\": \"Isapre\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						},
+						"description": "Intenta registrar un paciente con el mismo RUT que Pedro Pérez. Debe responder 409 Conflict."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "01. Autenticación (/auth)",
+			"item": [
+				{
+					"name": "POST Registro Dra. Ana",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('tokenAna', data.token);",
+									"    pm.collectionVariables.set('idAna', data.medico._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Ana Rojas\",\n  \"especialidad\": \"Pediatría\",\n  \"email\": \"ana@clinica.cl\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/registro",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"registro"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Registro Dr. Carlos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('tokenCarlos', data.token);",
+									"    pm.collectionVariables.set('idCarlos', data.medico._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Carlos Soto\",\n  \"especialidad\": \"Cardiología\",\n  \"email\": \"carlos@clinica.cl\",\n  \"password\": \"password456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/registro",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"registro"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Registro Email Duplicado -> 409",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Otra Ana\",\n  \"especialidad\": \"Dermatología\",\n  \"email\": \"ana@clinica.cl\",\n  \"password\": \"password789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/registro",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"registro"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Registro Faltan Campos -> 400",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Incompleto\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/registro",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"registro"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Login Exitoso Dra. Ana -> 200",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('tokenAna', data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"ana@clinica.cl\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Login Password Incorrecta -> 401",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"ana@clinica.cl\",\n  \"password\": \"clave_falsa\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02. Médicos (/medicos)",
+			"item": [
+				{
+					"name": "GET Médicos sin token -> 401",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/medicos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Todos los Médicos -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Médicos Filtrar ?especialidad=Pediatría -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos?especialidad=Pediatría",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos"
+							],
+							"query": [
+								{
+									"key": "especialidad",
+									"value": "Pediatría"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Médicos Especialidad Inexistente -> 200 []",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos?especialidad=Neurología",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos"
+							],
+							"query": [
+								{
+									"key": "especialidad",
+									"value": "Neurología"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Perfil del Médico Autenticado -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos/perfil",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos",
+								"perfil"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Médico por ID -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos/{{idCarlos}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos",
+								"{{idCarlos}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Médico ID Inexistente -> 404",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos/665f1c2b9a1e4d0012345678",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos",
+								"665f1c2b9a1e4d0012345678"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Médico ID Formato Inválido -> 400",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos/123",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos",
+								"123"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Pacientes de un Médico -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medicos/{{idAna}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medicos",
+								"{{idAna}}",
+								"pacientes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03. Pacientes (/pacientes)",
+			"item": [
+				{
+					"name": "GET Pacientes sin token -> 401",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Crear Paciente 1 (Fonasa) Dra. Ana -> 201",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('idPaciente1', data._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Pedro Pérez\",\n  \"rut\": \"12.345.678-9\",\n  \"fechaNacimiento\": \"1990-05-15\",\n  \"prevision\": \"Fonasa\",\n  \"telefono\": \"+56911223344\",\n  \"email\": \"pedro@correo.cl\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Crear Paciente 2 (Isapre) Dra. Ana -> 201",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const data = pm.response.json();",
+									"    pm.collectionVariables.set('idPaciente2', data._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"María Gómez\",\n  \"rut\": \"18.765.432-1\",\n  \"fechaNacimiento\": \"1995-10-20\",\n  \"prevision\": \"Isapre\",\n  \"telefono\": \"+56933445566\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Crear Paciente Previsión Inválida -> 400",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Invalido\",\n  \"rut\": \"99.999.999-9\",\n  \"fechaNacimiento\": \"2000-01-01\",\n  \"prevision\": \"SeguroInvalido\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Mis Pacientes Dra. Ana -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Mis Pacientes Filtrar ?prevision=Isapre -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes?prevision=Isapre",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							],
+							"query": [
+								{
+									"key": "prevision",
+									"value": "Isapre"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Mis Pacientes Dr. Carlos -> 200 []",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenCarlos}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Paciente por ID -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenCarlos}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Paciente Dr. Carlos (no tratante) -> 403",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenCarlos}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Intento Edición Carlos\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Paciente Dra. Ana (médico tratante) -> 200",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"telefono\": \"+56988776655\",\n  \"prevision\": \"Isapre\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Paciente Dr. Carlos (no tratante) -> 403",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenCarlos}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Paciente Dra. Ana (médico tratante) -> 204",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente2}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04. Desafío Extra - Fichas Clínicas",
+			"item": [
+				{
+					"name": "POST Ficha Dr. Carlos (no tratante) -> 403",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenCarlos}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"diagnostico\": \"Chequeo de rutina\",\n  \"tratamiento\": \"Control preventivo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente1}}/fichas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente1}}",
+								"fichas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Ficha Dra. Ana (médico tratante) -> 201",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"diagnostico\": \"Faringitis aguda\",\n  \"tratamiento\": \"Amoxicilina 500mg cada 8 horas por 7 días\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente1}}/fichas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente1}}",
+								"fichas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Fichas de Paciente -> 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAna}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pacientes/{{idPaciente1}}/fichas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pacientes",
+								"{{idPaciente1}}",
+								"fichas"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

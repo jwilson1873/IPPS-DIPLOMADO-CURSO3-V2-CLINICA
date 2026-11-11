@@ -1,0 +1,49 @@
+{
+	"id": "e2f1a638-3482-4c91-a20c-7729bd084b1f",
+	"name": "Clínica - Local",
+	"values": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "tokenAna",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "tokenCarlos",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "idAna",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "idCarlos",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "idPaciente1",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "idPaciente2",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment"
+}
