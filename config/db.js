@@ -1,6 +1,10 @@
 import mongoose from 'mongoose'
 
 export const conectar = async () => {
-  await mongoose.connect(process.env.MONGODB_URI)
+  const uri = process.env.MONGODB_URI
+  if (!uri) {
+    throw new Error('La variable MONGODB_URI no está definida en el entorno (.env)')
+  }
+  await mongoose.connect(uri)
   console.log('conectado a la bd')
 }

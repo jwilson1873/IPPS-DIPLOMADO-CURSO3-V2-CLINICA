@@ -36,7 +36,7 @@ export const actualizar = async (id, datos, medicoId) => {
   const pacienteActualizado = await Paciente.findByIdAndUpdate(
     id,
     datosActualizar,
-    { new: true, runValidators: true }
+    { returnDocument: 'after', runValidators: true }
   ).populate('medico', 'nombre especialidad email')
 
   return { paciente: pacienteActualizado }
