@@ -1,16 +1,18 @@
 import { Router } from 'express'
 import { proteger } from '../middlewares/proteger.js'
+import * as controller from '../controllers/paciente.controller.js'
 
 export const pacienteRoutes = Router()
 
-pacienteRoutes.use(proteger) // de aquí abajo, todo exige token
+// Todas las rutas de pacientes exigen token
+pacienteRoutes.use(proteger)
 
-pacienteRoutes.post('/', (req, res) => {
-  res.json({ mensaje: 'Pudiste pasar, eres un dctr' })
-})
-pacienteRoutes.get('/', (req, res) => {
-  res.json({ mensaje: 'Pudiste pasar, eres un dctr' })
-})
-pacienteRoutes.get('/:id', (req, res) => {
-  res.json({ mensaje: 'Pudiste pasar, eres un dctr' })
-})
+pacienteRoutes.post('/', controller.crear)
+pacienteRoutes.get('/', controller.obtenerMisPacientes)
+pacienteRoutes.get('/:id', controller.obtenerPorId)
+pacienteRoutes.put('/:id', controller.actualizar)
+pacienteRoutes.delete('/:id', controller.eliminar)
+
+// Desafío extra: Fichas clínicas
+pacienteRoutes.post('/:id/fichas', controller.crearFicha)
+pacienteRoutes.get('/:id/fichas', controller.obtenerFichas)
