@@ -3,13 +3,13 @@
 API REST para la gestión de médicos, pacientes y fichas clínicas desarrollada con **Node.js**, **Express** y **MongoDB (Mongoose)**, implementando autenticación mediante **JWT**, control de acceso basado en reglas de negocio y arquitectura en capas: `routes → controllers → services → models`.
 
 Proyecto correspondiente a la **Evaluación Integradora · Clínica** del **Diplomado · Módulo 3 · Backend y APIs REST** del **Instituto Profesional San Sebastián**.
-
+James Wilson Marambio
 ---
 
 ## 📹 Video de Demostración y Explicación
 
-> **Enlace al video en YouTube:**  
-> 👉 **[VER VIDEO EN YOUTUBE](https://www.youtube.com/watch?v=TU_ENLACE_AQUI)** *(Reemplazar con tu enlace final)*
+> **Enlace al video en Drive:**  
+> 👉 **[VER VIDEO EN DRIVE](https://drive.google.com/file/d/1T3tQIwoU4j_vUDXsA93EbLtqy_4ays_J/view?usp=drive_link)** **
 
 ---
 
